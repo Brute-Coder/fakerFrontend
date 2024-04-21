@@ -10,14 +10,12 @@ import {
   createRoutesFromElements,
 } from "react-router-dom";
 import NetworkLogger from "./views/NetworkLogger.jsx";
-import EventLoggerConfig from "./views/TempLogger.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
       <Route path="" element={<App />} />
       <Route path="/netLogger" element={<NetworkLogger />} />
-      {/* <Route path="/netLogger" element={<EventLoggerConfig />} /> */}
     </Route>
   )
 );
