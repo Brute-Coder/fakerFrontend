@@ -1,10 +1,15 @@
-import { useState  , useEffect} from "react";
-import { options, Qtyinput , EventTable ,CustomToastContainer } from "./components";
+import { useState, useEffect } from "react";
+import {
+  options,
+  Qtyinput,
+  EventTable,
+  CustomToastContainer,
+} from "./components";
 import Select from "react-select";
 import "react-toastify/dist/ReactToastify.css";
 import { Button } from "flowbite-react";
 import axios from "axios";
-import {toast} from "react-toastify"
+import { toast } from "react-toastify";
 
 export default function App() {
   const [eventQty, setEventQty] = useState(0);
@@ -15,74 +20,75 @@ export default function App() {
   const [fetchedProcess, setFetchedProcess] = useState([]);
 
   async function handleGenerate() {
-
-    if(!events){
-      toast.warning("Choose at least one event")
-      return 
+    if (!events) {
+      toast.warning("Choose at least one event");
+      return;
     }
-    if(eventQty <= 0){
-      toast.warning("Number of events can't be zero")
-      return 
+    if (eventQty <= 0) {
+      toast.warning("Number of events can't be zero");
+      return;
     }
     const saveLog = saveFile ? 1 : 0;
     if (!generateMul) {
-      let tempFP = [...fetchedProcess]; 
+      let tempFP = [...fetchedProcess];
       let data = await queryEvents(events.value, saveLog);
       tempFP.push(data);
       setFetchedProcess(tempFP);
     } else {
-      let fetchedData = await Promise.all(events.map(async (singleEvent) => {
-        let data = await queryEvents(singleEvent.value, saveLog);
-        return data;
-      }));
-       setFetchedProcess(fetchedData);
+      let fetchedData = await Promise.all(
+        events.map(async (singleEvent) => {
+          let data = await queryEvents(singleEvent.value, saveLog);
+          return data;
+        })
+      );
+      setFetchedProcess(fetchedData);
     }
-    toast.success("Successfully generated events!!")
-    if(saveFile){
-      if(directory !== ""){
-        toast.success(`log saved in ${validateFilename(directory)}`)
-      }else{
-        toast.success('log saved in default directory')
+    toast.success("Successfully generated events!!");
+    if (saveFile) {
+      if (directory !== "") {
+        toast.success(`log saved in ${validateFilename(directory)}`);
+      } else {
+        toast.success("log saved in default directory");
       }
     }
   }
 
-  async function queryEvents(route,saveLog){
-     try {
-        const backEndUri = "http://127.0.0.1:5000";
-        let masterUri = `${backEndUri}${route}?qty=${eventQty}&savelog=${saveLog}`
-        if(saveLog && directory !== ""){
-           let dirname = validateFilename(directory);
-           masterUri = masterUri +`&filename=${dirname}`
-        }
-        const data = await axios.get(masterUri);
-        return data.data;
-     } catch (e) {
-        toast.error("error while fetching data")
-        console.log("got some error while fetching data " , e);
-     }
+  async function queryEvents(route, saveLog) {
+    try {
+      const backEndUri = "http://127.0.0.1:5000";
+      let masterUri = `${backEndUri}${route}?qty=${eventQty}&savelog=${saveLog}`;
+      if (saveLog && directory !== "") {
+        let dirname = validateFilename(directory);
+        masterUri = masterUri + `&filename=${dirname}`;
+      }
+      const data = await axios.get(masterUri);
+      return data.data;
+    } catch (e) {
+      toast.error("error while fetching data");
+      console.log("got some error while fetching data ", e);
+    }
   }
 
   function validateFilename(filename) {
     if (filename.endsWith(".txt")) {
-        return filename;
+      return filename;
     } else {
-        return filename + ".txt";
+      return filename + ".txt";
     }
-}
+  }
 
- function handleClear(){
-     setFetchedProcess([])
-     setDirectory("")
-     setEventQty(0)
-     setEvents(null)
-     toast.success("Cleared all processes")
- }
+  function handleClear() {
+    setFetchedProcess([]);
+    setDirectory("");
+    setEventQty(0);
+    setEvents(null);
+    toast.success("Cleared all processes");
+  }
 
   useEffect(() => {
-    setFetchedProcess(fetchedProcess)
+    setFetchedProcess(fetchedProcess);
   }, [fetchedProcess]);
-  
+
   return (
     <div>
       <h1 className=" mt-3 font-dosis text-3xl text-center p-4 font-bold">
@@ -125,13 +131,15 @@ export default function App() {
             <Qtyinput value={{ eventQty, setEventQty }} />
           </div>
           <div>
-            <label className=" block mb-2 text-md font-dosis dark:text-white font-medium text-gray-900 " >
+            <label className=" block mb-2 text-md font-dosis dark:text-white font-medium text-gray-900 ">
               File name to save the logs:
             </label>
             <div className=" flex flex-row gap-2">
               <input
                 type="text"
-                className={`font-dosis hover:scale-105 ${saveFile ? "" : "cursor-not-allowed" } rounded-lg dark:text-black  focus:outline-none `}
+                className={`font-dosis hover:scale-105 ${
+                  saveFile ? "" : "cursor-not-allowed"
+                } rounded-lg dark:text-black  focus:outline-none `}
                 disabled={!saveFile}
                 value={directory}
                 placeholder="filename.txt"
@@ -167,14 +175,28 @@ export default function App() {
             Generate Event
           </Button>
         </div>
-        <div className=" mt-5 container overflow-auto h-96 w-2/3 border border-black rounded-xl ">
-          {  fetchedProcess ?  fetchedProcess.map((fetchedProcess,ind)=> <EventTable key = {ind}value={{fetchedProcess}}/>)  : null}        
+        <div className=" mt-5 container overflow-auto h-96 w-2/3 border border-black rounded-xl  shadow-xl">
+          {fetchedProcess
+            ? fetchedProcess.map((fetchedProcess, ind) => (
+                <EventTable key={ind} value={{ fetchedProcess }} />
+              ))
+            : null}
         </div>
-           {fetchedProcess && fetchedProcess.length >0 && <div className=" absolute bottom-6 right-8 ">
-                <Button outline gradientDuoTone="greenToBlue" className=" hover:scale-105" onClick={handleClear}> Clear Result</Button>
-          </div>}
+        {fetchedProcess && fetchedProcess.length > 0 && (
+          <div className=" absolute bottom-6 right-8 ">
+            <Button
+              outline
+              gradientDuoTone="greenToBlue"
+              className=" hover:scale-105"
+              onClick={handleClear}
+            >
+              {" "}
+              Clear Result
+            </Button>
+          </div>
+        )}
       </div>
-      <CustomToastContainer/>
+      <CustomToastContainer />
     </div>
   );
 }
