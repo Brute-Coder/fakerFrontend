@@ -107,7 +107,7 @@ export default function App() {
                 onChange={(selectedOption) => setEvents(selectedOption)}
                 isMulti={generateMul}
                 placeholder="Select Events"
-                className=" hover:scale-105"
+                className=" hover:scale-105 z-10"
               />
               <div className="flex items-center me-4 ">
                 <input
